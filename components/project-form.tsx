@@ -43,14 +43,20 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof projectSchema>) => {
+  
+  const onSubmit = async (data: { title: string; description: string; image_url: string; link: string; tags: string }) => {
     setIsSubmitting(true);
     try {
+      const formattedData = {
+        ...data,
+        tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+      };
+
       if (project) {
         await supabase
           .from("projects")
           .update({
-            ...data,
+            ...formattedData,
             updated_at: new Date().toISOString(),
           })
           .eq("id", project.id);
@@ -60,7 +66,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           .from("projects")
           .insert([
             {
-              ...data,
+              ...formattedData,
               user_id: user?.id,
             },
           ]);
