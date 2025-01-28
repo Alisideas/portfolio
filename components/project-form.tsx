@@ -7,7 +7,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase";
+
 
 const projectSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
@@ -44,42 +44,10 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
   });
 
   
-  const onSubmit = async (data: { title: string; description: string; image_url: string; link: string; tags: string }) => {
-    setIsSubmitting(true);
-    try {
-      const formattedData = {
-        ...data,
-        tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
-      };
 
-      if (project) {
-        await supabase
-          .from("projects")
-          .update({
-            ...formattedData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", project.id);
-      } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        await supabase
-          .from("projects")
-          .insert([
-            {
-              ...formattedData,
-              user_id: user?.id,
-            },
-          ]);
-      }
-      onSuccess();
-    } catch (error) {
-      console.error("Error saving project:", error);
-    }
-    setIsSubmitting(false);
-  };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={() => {}} className="space-y-6">
       <div>
         <Input
           placeholder="Project Title"
